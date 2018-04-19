@@ -5,3 +5,12 @@ provider "aws" {
     external_id  = "EXTERNAL_ID"
   }
 }
+
+resource "aws_instance" "web" {
+  ami           = "ami-2e1ef954"
+  instance_type = "t2.micro"
+
+  tags {
+    Name = "assumed_role_instance"
+  }
+}
