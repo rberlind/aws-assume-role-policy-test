@@ -15,20 +15,30 @@ if ((length(tfconfig.providers) else 0) > 0) {
     aws = tfconfig.providers.aws
     aliases = aws["alias"]
     for aliases as alias, data {
-      print ( "alias is: ", alias )
+      print ("alias is:", alias)
+      #print ("assume_role config is:", data["config"]["assume_role"])
+      #print ("assume_role references is:", data["references"]["assume_role"])
       if (length(data["config"]["assume_role"]) else 0) > 0 {
-        assume_role = data["config"]["assume_role"]
+        assume_role = data["references"]["assume_role"]
         print ( "assume_role is: ", assume_role )
-        role_arn = assume_role[0]["role_arn"]
+        role_arn = assume_role[0]["role_arn"][0]
     	  if role_arn matches "\\$\\{var\\.(.*)\\}" {
-          # role_arn of AWS provider was a variable
-      	  print ( "role_arn is a variable" )
+          # role_arn of AWS provider was a Terraform 0.11 style variable
+      	  print ( "role_arn is a Terraform 0.11 style variable" )
       	  role_arn_variable = strings.trim_suffix(strings.trim_prefix(role_arn, "${var."), "}")
       	  print ( "role_arn variable is: ", role_arn_variable )
       	  print ( "Value of role_arn is: ", tfplan.variables[role_arn_variable] )
       	  role_arn_value = tfplan.variables[role_arn_variable]
           assumed_accounts += [role_arn_value]
-    	  } else {
+    	  } else if role_arn matches "var\\.(.*)" {
+          # role_arn of AWS provider was a Terraform 0.12 style variable
+      	  print ( "role_arn is a Terraform 0.12 style variable" )
+      	  role_arn_variable = strings.trim_prefix(role_arn, "var.")
+      	  print ( "role_arn variable is: ", role_arn_variable )
+      	  print ( "Value of role_arn is: ", tfplan.variables[role_arn_variable] )
+      	  role_arn_value = tfplan.variables[role_arn_variable]
+          assumed_accounts += [role_arn_value]   
+        } else {
           # role_arn of AWS provider was had hard-coded role_arn
           print ( "role_arn is a hard-coded value" )
       	  print ( "Value of role_arn is: ", role_arn )
