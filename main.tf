@@ -1,5 +1,6 @@
 variable "role" {
   description = "IAM Role to assume"
+  default = "arn:aws:iam::753646501470:role/roger-terraform-assumed-role"
 }
 
 provider "aws" {
@@ -7,8 +8,6 @@ provider "aws" {
   assume_role {
     #role_arn     = "arn:aws:iam::128997349609:role/terraform-role"
     role_arn = "${var.role}"
-    session_name = "SESSION_NAME"
-    external_id  = "EXTERNAL_ID"
   }
 }
 
