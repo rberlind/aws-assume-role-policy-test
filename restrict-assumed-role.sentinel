@@ -82,7 +82,7 @@ get_assumed_roles = func() {
     providers = tfconfig.providers
     if "aws" in keys(providers) {
       aws = tfconfig.providers.aws
-      #print("aws:", aws)
+      print("aws:", aws)
 
       # Process default provider
       #print("processing default provider.")
